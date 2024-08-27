@@ -1,11 +1,13 @@
 <!DOCTYPE html>
-<html lang="zh-CN">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>密码锁游戏</title>
+    <title>Guess the Number Game</title>
+    <!-- 引入QR码生成库 -->
     <script src="https://cdn.jsdelivr.net/npm/qrcode-generator@1.4.4/qrcode.min.js"></script>
     <style>
+        /* 基本页面样式 */
         body {
             font-family: Arial, sans-serif;
             display: flex;
@@ -15,6 +17,7 @@
             margin: 0;
             background-color: #f0f0f0;
         }
+        /* 游戏容器样式 */
         .container {
             text-align: center;
             background-color: white;
@@ -22,20 +25,30 @@
             border-radius: 10px;
             box-shadow: 0 0 10px rgba(0,0,0,0.1);
         }
+        /* 输入框样式 */
         input {
-            width: 40px;
-            height: 40px;
-            font-size: 20px;
-            text-align: center;
-            margin: 0 5px;
-        }
-        button {
+            width: 50px;
+            margin: 5px;
+            padding: 5px;
             font-size: 16px;
-            margin: 20px 0;
         }
+        /* 按钮样式 */
+        button {
+            margin-top: 10px;
+            padding: 10px 20px;
+            font-size: 16px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        /* 结果显示区域样式 */
         #result {
             margin-top: 20px;
+            font-weight: bold;
         }
+        /* QR码显示区域样式 */
         #qrcode {
             margin-top: 20px;
         }
@@ -43,66 +56,50 @@
 </head>
 <body>
     <div class="container">
-        <h1>密码锁游戏</h1>
-        <p>请输入4位密码：</p>
+        <h1>Guess the 4-Digit Number</h1>
+        <!-- 四个输入框用于猜数字 -->
         <div>
-            <input type="text" maxlength="1" id="digit1" oninput="moveToNext(this, 'digit2')">
-            <input type="text" maxlength="1" id="digit2" oninput="moveToNext(this, 'digit3')">
-            <input type="text" maxlength="1" id="digit3" oninput="moveToNext(this, 'digit4')">
-            <input type="text" maxlength="1" id="digit4" oninput="moveToNext(this, 'submitBtn')">
+            <input type="text" maxlength="1" id="digit1">
+            <input type="text" maxlength="1" id="digit2">
+            <input type="text" maxlength="1" id="digit3">
+            <input type="text" maxlength="1" id="digit4">
         </div>
-        <button id="submitBtn" onclick="checkPassword()">提交</button>
+        <!-- 提交按钮 -->
+        <button onclick="checkGuess()">Submit Guess</button>
+        <!-- 结果显示区域 -->
         <div id="result"></div>
+        <!-- QR码显示区域 -->
         <div id="qrcode"></div>
     </div>
 
     <script>
-        const password = "1234";
-        let attempts = 0;
+        // 检查猜测是否正确
+        function checkGuess() {
+            // 正确答案
+            const correctAnswer = "1992";
+            // 获取用户输入的猜测
+            const guess = document.getElementById("digit1").value +
+                          document.getElementById("digit2").value +
+                          document.getElementById("digit3").value +
+                          document.getElementById("digit4").value;
 
-        function moveToNext(currentInput, nextInputId) {
-            if (currentInput.value.length === currentInput.maxLength) {
-                document.getElementById(nextInputId).focus();
-            }
-        }
-
-        function checkPassword() {
-            const guess = [
-                document.getElementById('digit1').value,
-                document.getElementById('digit2').value,
-                document.getElementById('digit3').value,
-                document.getElementById('digit4').value
-            ].join('');
-
-            attempts++;
-
-            if (guess.length !== 4 || !/^\d+$/.test(guess)) {
-                document.getElementById('result').innerHTML = "请输入4位数字密码";
-                return;
-            }
-
-            if (guess === password) {
-                showQRCode();
+            // 比较猜测和正确答案
+            if (guess === correctAnswer) {
+                document.getElementById("result").innerHTML = "Congratulations! You guessed correctly!";
+                generateQRCode(); // 如果猜对了，生成QR码
             } else {
-                const correctPositions = guess.split('').filter((digit, index) => digit === password[index]).length;
-                document.getElementById('result').innerHTML = `密码错误！正确位置的数字有 ${correctPositions} 个。<br>尝试次数：${attempts}`;
+                document.getElementById("result").innerHTML = "Sorry, that's not correct. Try again!";
             }
-
-            // Clear input fields
-            ['digit1', 'digit2', 'digit3', 'digit4'].forEach(id => {
-                document.getElementById(id).value = '';
-            });
-            document.getElementById('digit1').focus();
         }
 
-        function showQRCode() {
-            const qr = qrcode(0, 'L');
-            qr.addData("恭喜你破解了密码！");
-            qr.make();
+        // 生成QR码
+        function generateQRCode() {
+            const qr = qrcode(0, 'M'); // 创建QR码对象
+            qr.addData('Mickey'); // 设置QR码内容
+            qr.make(); // 生成QR码
+            // 在页面上显示QR码
             document.getElementById('qrcode').innerHTML = qr.createImgTag(5);
-            document.getElementById('result').innerHTML = `恭喜你破解了密码！<br>密码是：${password}<br>尝试次数：${attempts}`;
         }
     </script>
 </body>
 </html>
-
